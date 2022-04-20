@@ -1,7 +1,7 @@
 import numpy as np
 
 from environment import Environment
-from ant import Ant 
+from ant import Ant
 
 # Class representing the ant colony
 """
@@ -11,33 +11,42 @@ from ant import Ant
     beta: a parameter controlling the influence of the distance to the next node during ants' path selection process
     rho: pheromone evaporation rate
 """
+
+
 class AntColony:
-    def __init__(self, ant_population: int, iterations: int, alpha: float, beta: float, rho: float):
+    def __init__(
+        self,
+        ant_population: int,
+        iterations: int,
+        alpha: float,
+        beta: float,
+        rho: float,
+    ):
         self.ant_population = ant_population
         self.iterations = iterations
         self.alpha = alpha
         self.beta = beta
-        self.rho = rho 
+        self.rho = rho
 
         # Initialize the environment of the ant colony
-        self.environment = Environment(self.rho)
+        self.environment = Environment(self.rho, ant_population)
 
         # Initilize the list of ants of the ant colony
         self.ants = []
 
         # Initialize the ants of the ant colony
         for i in range(ant_population):
-            
-            # Initialize an ant on a random initial location 
+
+            # Initialize an ant on a random initial location
             ant = Ant(self.alpha, self.beta, None)
 
             # Position the ant in the environment of the ant colony so that it can move around
             ant.join(self.environment)
-        
+
             # Add the ant to the ant colony
             self.ants.append(ant)
 
-    # Solve the ant colony optimization problem  
+    # Solve the ant colony optimization problem
     def solve(self):
 
         # The solution will be a list of the visited cities
@@ -59,5 +68,5 @@ def main():
     print("Distance: ", distance)
 
 
-if __name__ == '__main__':
-    main()    
+if __name__ == "__main__":
+    main()

@@ -1,17 +1,18 @@
-
 # Class representing an artificial ant of the ant colony
 """
     alpha: a parameter controlling the influence of the amount of pheromone during ants' path selection process
     beta: a parameter controlling the influence of the distance to the next node during ants' path selection process
 """
-class Ant():
+
+
+class Ant:
     def __init__(self, alpha: float, beta: float, initial_location):
         self.alpha = alpha
         self.beta = beta
         self.current_location = initial_location
         self.travelled_distance = 0
 
-    # The ant runs to visit all the possible locations of the environment 
+    # The ant runs to visit all the possible locations of the environment
     def run(self):
         pass
 
@@ -22,34 +23,5 @@ class Ant():
     # Position an ant in an environment
     def join(self, environment):
         self.environment = environment
-
-    
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
 
         3
