@@ -6,6 +6,8 @@ import random
 import matplotlib.pyplot as plt
 import networkx as nx
 
+random.seed(42)
+
 # Class representing the ant colony
 """
     ant_population: the number of ants in the ant colony
@@ -37,12 +39,15 @@ class AntColony:
         # Initialize the list of ants of the ant colony
         self.ants = []
 
+        locations = self.environment.get_possible_locations()
+        random.shuffle(locations)
+
         # Initialize the ants of the ant colony
         for i in range(ant_population):
 
             # Initialize an ant on a random initial location
-            random_location = random.choice(self.environment.get_possible_locations())
-            ant = Ant(self.alpha, self.beta, random_location)
+            # random_location = random.choice(self.environment.get_possible_locations())
+            ant = Ant(self.alpha, self.beta, locations[i])
 
             # Position the ant in the environment of the ant colony so that it can move around
             ant.join(self.environment)
@@ -52,42 +57,48 @@ class AntColony:
 
     # Solve the ant colony optimization problem
     def solve(self):
-        for _ in range(self.iterations):
-            tours = []
-            for ant in self.ants:
-                ant.run()
-                tours.append(ant.visited_cities)
-            self.environment.update_pheromone_map(tours)
-
-        self.ants[0].run()
-        tour = self.ants[0].visited_cities
-
+        # Draw Graph
         graph = self.environment.topology.get_graph()
         nodes = self.environment.topology.get_nodes()
         pos = {}
         for node in nodes:
             coords = self.environment.topology.node_coords[node]
             pos[node] = tuple(coords)
+        options = {
+            "node_size": 70,
+        }
+
+        # Run simulation
+        for i in range(self.iterations):
+            print(f"Running iteration {i}...")
+            nx.draw_networkx_nodes(graph, pos=pos, **options)
+            locations = self.environment.get_possible_locations()
+            random.shuffle(locations)
+            tours = []
+            for j, ant in enumerate(self.ants):
+                ant.run()
+                tours.append(ant.visited_cities)
+                # Reset ant
+                ant.reset(locations[j])
+            self.environment.update_pheromone_map(tours)
+            for tour in tours:
+                edgelist = []
+                for j in range(len(tour) - 1):
+                    edgelist.append((tour[j], tour[j + 1]))
+                nx.draw_networkx_edges(
+                    graph, pos=pos, edgelist=edgelist, edge_color="red", alpha=0.02
+                )  # highlight the edges in the path
+            if i % 100 == 0:
+                plt.savefig(f"graphs/graph{i}.png")
+            plt.clf()
+
+        self.ants[0].run()
+        tour = self.ants[0].visited_cities
 
         # The solution will be a list of the visited cities
         solution = tour
 
         tour = tour + [tour[0]]  # Make full round
-        edgelist = []
-        for i in range(len(tour) - 1):
-            edgelist.append((tour[i], tour[i + 1]))
-        options = {
-            "node_size": 70,
-        }
-        nx.draw_networkx_nodes(graph, pos=pos, **options)
-        nx.draw_networkx_edges(
-            graph, pos=pos, alpha=0.01
-        )  # draw all edges with transparency
-        nx.draw_networkx_edges(
-            graph, pos=pos, edgelist=edgelist, edge_color="red"
-        )  # highlight the edges in the path
-
-        plt.savefig("graph.png")
 
         # Initially, the shortest distance is set to infinite
         shortest_distance = self.ants[0].travelled_distance
@@ -97,7 +108,7 @@ class AntColony:
 
 def main():
     # Intialize the ant colony
-    ant_colony = AntColony(48, 1000, 1, 5, 0.5)
+    ant_colony = AntColony(ant_population=48, iterations=101, alpha=1, beta=5, rho=0.5)
 
     # Solve the ant colony optimization problem
     solution, distance = ant_colony.solve()

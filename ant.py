@@ -1,5 +1,7 @@
 import random
 
+random.seed(42)
+
 # Class representing an artificial ant of the ant colony
 """
     alpha: a parameter controlling the influence of the amount of pheromone during ants' path selection process
@@ -20,6 +22,7 @@ class Ant:
         while len(self.visited_cities) < len(self.environment.get_possible_locations()):
             next_city = self.select_path()
             distance = self.environment.get_distance(self.current_location, next_city)
+            # print(f"Current city {self.current_location}, next city: {next_city}, distance {distance}")
             self.travelled_distance += distance
             self.current_location = next_city
             self.visited_cities.append(self.current_location)
@@ -38,17 +41,24 @@ class Ant:
             distance = self.environment.get_distance(self.current_location, city)
             heuristic_distance = 1 / distance
             value = pheromone_value**self.alpha * heuristic_distance**self.beta
+            # print(f"pheromone value: {pheromone_value}, distance: {distance}, heuristic distance {heuristic_distance}, value {value}")
             probabilities[city] = value
             sum += value
 
         for city in feasible_neighborhood:
             probabilities[city] = probabilities[city] / sum
 
+        # print(f"probabilities: {probabilities}")
         # Random choice based on calculated probabilities
         next_city = random.choices(
             list(probabilities.keys()), list(probabilities.values())
         )[0]
         return next_city
+
+    def reset(self, location):
+        self.current_location = location
+        self.travelled_distance = 0
+        self.visited_cities = [location]
 
     # Position an ant in an environment
     def join(self, environment):
