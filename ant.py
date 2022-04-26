@@ -26,6 +26,13 @@ class Ant:
             self.travelled_distance += distance
             self.current_location = next_city
             self.visited_cities.append(self.current_location)
+        # Return to initial location
+        distance = self.environment.get_distance(
+            self.current_location, self.visited_cities[0]
+        )
+        self.travelled_distance += distance
+        self.current_location = self.visited_cities[0]
+        self.visited_cities.append(self.current_location)
 
     # Select the next path based on the random proportional rule of the ACO algorithm
     def select_path(self):
@@ -44,6 +51,9 @@ class Ant:
             # print(f"pheromone value: {pheromone_value}, distance: {distance}, heuristic distance {heuristic_distance}, value {value}")
             probabilities[city] = value
             sum += value
+
+        if sum == 0:
+            return random.choice(list(probabilities.keys()))
 
         for city in feasible_neighborhood:
             probabilities[city] = probabilities[city] / sum
