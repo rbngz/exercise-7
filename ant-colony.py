@@ -39,15 +39,16 @@ class AntColony:
         # Initialize the list of ants of the ant colony
         self.ants = []
 
-        locations = self.environment.get_possible_locations()
-        random.shuffle(locations)
+        # To draw random location without duplicates
+        # locations = self.environment.get_possible_locations()
+        # random.shuffle(locations)
 
         # Initialize the ants of the ant colony
         for i in range(ant_population):
 
             # Initialize an ant on a random initial location
-            # random_location = random.choice(self.environment.get_possible_locations())
-            ant = Ant(self.alpha, self.beta, locations[i])
+            random_location = random.choice(self.environment.get_possible_locations())
+            ant = Ant(self.alpha, self.beta, random_location)
 
             # Position the ant in the environment of the ant colony so that it can move around
             ant.join(self.environment)
@@ -75,8 +76,16 @@ class AntColony:
             locations = self.environment.get_possible_locations()
             random.shuffle(locations)
             tours = []
+
+            solution = None
+            shortest_distance = np.inf
+
             for j, ant in enumerate(self.ants):
                 ant.run()
+                distance = ant.travelled_distance
+                if distance < shortest_distance:
+                    shortest_distance = distance
+                    solution = ant.visited_cities
                 tours.append(ant.visited_cities)
                 # Reset ant
                 ant.reset(locations[j])
@@ -88,27 +97,18 @@ class AntColony:
                 nx.draw_networkx_edges(
                     graph, pos=pos, edgelist=edgelist, edge_color="red", alpha=0.02
                 )  # highlight the edges in the path
-            if i % 100 == 0:
-                plt.savefig(f"graphs/graph{i}.png")
+            # if i % 1 == 0:
+            #    plt.savefig(f"graphs/graph{i}.png")
+            #    print(distance)
+
             plt.clf()
-
-        self.ants[0].run()
-        tour = self.ants[0].visited_cities
-
-        # The solution will be a list of the visited cities
-        solution = tour
-
-        tour = tour + [tour[0]]  # Make full round
-
-        # Initially, the shortest distance is set to infinite
-        shortest_distance = self.ants[0].travelled_distance
 
         return solution, shortest_distance
 
 
 def main():
     # Intialize the ant colony
-    ant_colony = AntColony(ant_population=48, iterations=101, alpha=1, beta=5, rho=0.5)
+    ant_colony = AntColony(ant_population=48, iterations=100, alpha=1, beta=1, rho=0.5)
 
     # Solve the ant colony optimization problem
     solution, distance = ant_colony.solve()

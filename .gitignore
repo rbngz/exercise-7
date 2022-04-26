@@ -3,6 +3,11 @@ __pycache__/
 *.py[cod]
 *$py.class
 
+parameter_selection/
+graphs/*
+gifs/
+.DS_Store
+
 # C extensions
 *.so
 
